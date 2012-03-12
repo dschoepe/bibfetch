@@ -7,7 +7,7 @@
 
 ;; This programs uses the accompanying bibfetch.pl script
 ;; to fetch BibTeX entries from Google Scholar, and provides
-;; some convience functionality for insert selected entries into
+;; some convenience functionality for insert selected entries into
 ;; a bibtex file. See README.org for usage information.
 
 ;;; Code:
