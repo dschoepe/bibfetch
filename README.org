@@ -22,18 +22,21 @@ with any non-ancient version of emacs.
 
 See =bibfetch.pl -h= for usage information about the command line script.
 
-For emacs integration, it should be sufficient to execute =(require 'bibfetch)=
-somewhere in your emacs configuration and calling the =bibfetch= function afterwards.
-This is best done from the .bib file where you want to insert an entry, as it allows
-to copying entries directly to the buffer from where it was called.
+For emacs integration, it should be sufficient to execute =(require
+'bibfetch)= somewhere in your emacs configuration and calling the
+=bibfetch= function afterwards. Note that this requires that
+=bibfetch.pl= is in your =$PATH=, otherwise the variable
+=bibfetch-script= needs to be adjusted accordingly.
 
 Calling =bibfetch= will ask for a query term (which can be anything
 Google Scholar accepts), and then display a buffer with the
 results. In that buffer, j/k and the arrow keys can be used to
 navigate through the results. y copies the currently selected entry in
 the killring, and <return> inserts the article in the buffer in which
-bibfetch was called.  Additionally, keybindings from bibtex-mode are
-also available, and its settings, such as highlighting are used.
+bibfetch was called (which makes it useful to call the function from
+the .bib file you wish to add to).  Additionally, keybindings from
+bibtex-mode are also available, and its settings, such as highlighting
+are used.
 
 ** Shortcomings
 
