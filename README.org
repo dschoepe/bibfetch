@@ -1,0 +1,46 @@
+* bibfetch.{pl,el}
+
+These scripts allow searching for BibTeX entries on Google Scholar and
+conveniently adding results to .bib files (at least the elisp code does).
+
+** Requirements
+
+=bibfetch.pl= needs a few Perl modules, namely:
+
+- =URI= and =URI::Escape= (available in =liburi-perl= for Debian/Ubuntu users)
+- =Web::Scraper= (=libweb-scraper-perl=)
+- =WWW::Mechanize= (=libwww-mechanize-perl=)
+- =String::Random= (=libstring-random-perl=)
+- =Pod::Usage= (Included with =perl-modules=)
+- =Getopt::Long= (=libgetargs-long-perl=)
+- =List::Util= (In =perl-base=)
+
+=bibfetch.el= requires Emacs (duh), and bibtex.el which should be included
+with any non-ancient version of emacs.
+
+** Usage
+
+See =bibfetch.pl -h= for usage information about the command line script.
+
+For emacs integration, it should be sufficient to execute =(require 'bibfetch)=
+somewhere in your emacs configuration and calling the =bibfetch= function afterwards.
+This is best done from the .bib file where you want to insert an entry, as it allows
+to copying entries directly to the buffer from where it was called.
+
+Calling =bibfetch= will ask for a query term (which can be anything
+Google Scholar accepts), and then display a buffer with the
+results. In that buffer, j/k and the arrow keys can be used to
+navigate through the results. y copies the currently selected entry in
+the killring, and <return> inserts the article in the buffer in which
+bibfetch was called.  Additionally, keybindings from bibtex-mode are
+also available, and its settings, such as highlighting are used.
+
+** Shortcomings
+
+Currently, these scripts only support Google Scholar, but offering
+some alternatives would be nice.
+
+** Copyright / License
+
+This is free software, licensed under the 3-clause BSD license. See
+LICENSE for details.
