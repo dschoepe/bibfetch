@@ -5,24 +5,24 @@
 
 ;;; Commentary:
 
-;; This programs uses the accompanying bibfetch.pl script
-;; to fetch BibTeX entries from Google Scholar, and provides
-;; some convenience functionality for insert selected entries into
-;; a bibtex file. See README.org for usage information.
+;; This programs uses the accompanying bibfetch.pl script to fetch
+;; BibTeX entries from Google Scholar, and provides some convenience
+;; functionality for inserting entries into a bibtex file. See
+;; README.org for usage information.
 
 ;;; Code:
 
 (require 'bibtex)
 
 (defcustom bibfetch-script "bibfetch.pl"
-  "Path to bibfetch.pl script")
+  "Path to the bibfetch.pl script.")
 
 (defvar bibfetch-original-buffer nil
   "Buffer from which bibtex was called.")
 (make-variable-buffer-local 'bibfetch-original-buffer)
 
 (defun bibfetch-next-entry ()
-  "Skip to next entry"
+  "Skip to next entry."
   (interactive)
   (bibtex-end-of-entry)
   (forward-char)
