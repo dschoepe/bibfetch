@@ -28,7 +28,6 @@ sub gscholar {
   $mech->agent_alias("Linux Mozilla");
   $mech->add_header(Cookie => "GSP=ID=$gid:CF=4");
 
-  $query = "doi:".$query if $doi;
   $query = "allintitle: ".$query unless ($fulltext or $doi);
   
   $query = uri_escape($query);
