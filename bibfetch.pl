@@ -17,7 +17,7 @@ our $verbose;
 
 sub gscholar {
 
-  my ($query, $limit, $fulltext) = @_;
+  my ($query, $limit, $fulltext, $doi) = @_;
   my $mech = WWW::Mechanize->new();
 
   # Generate a random string consisting of 16 hex characters for the
@@ -28,7 +28,9 @@ sub gscholar {
   $mech->agent_alias("Linux Mozilla");
   $mech->add_header(Cookie => "GSP=ID=$gid:CF=4");
 
-  $query = "allintitle: ".$query unless $fulltext;
+  $query = "doi:".$query if $doi;
+  $query = "allintitle: ".$query unless ($fulltext or $doi);
+  
   $query = uri_escape($query);
 
   my $url = "http://scholar.google.com/scholar?hl=en&q=".$query."&num=".$limit;
@@ -73,7 +75,7 @@ sub gscholar {
 }
 
 
-my ($help, $pdfs, $fulltext);
+my ($help, $pdfs, $fulltext, $doi);
 my $limit = 5;
 
 binmode STDOUT, ":utf8";
@@ -82,6 +84,7 @@ GetOptions("h|help" => \$help,
            "l|limit=i" => \$limit,
            "v|verbose" => \$verbose,
            "f|fulltext" => \$fulltext,
+	   "d|doi" => \$doi,
            "p|pdf" => \$pdfs)
   or pod2usage(1);
 
@@ -92,7 +95,7 @@ pod2usage(-message => "No query given", -verbose => 1)
 
 my $query = join(" ", @ARGV);
 
-my @results = gscholar($query, $limit, $fulltext);
+my @results = gscholar($query, $limit, $fulltext, $doi);
 
 for my $result (@results[0..min($#results, $limit-1)]) {
   print $result->{bibtex};
@@ -121,6 +124,7 @@ link to a pdf, preceded by "PDF: ".
     -v|--verbose         Print more information on stderr
     -l|--limit=LIMIT     Maximum number of entries to print (default: 5)
     -p|--pdf             Include PDF links in output (if any)
+    -d|--doi             Search string passed in is DOI
     -f|--fulltext        Search full article text, not just the title (default)
 
 QUERY can contain anything Google Scholar accepts, such as
