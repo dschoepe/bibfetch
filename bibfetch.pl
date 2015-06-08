@@ -34,18 +34,12 @@ sub dblp {
     my %data = ();
     if (defined $entry->{'class'} && $entry->{'class'} =~ /entry/) {
       # Don't escape URL since key is used verbatim as part of URL.
-      my $biburl = "http://dblp.uni-trier.de/rec/bib2/".$entry->{'id'}.".bib";
+      my $biburl = "http://dblp.uni-trier.de/rec/bib1/".$entry->{'id'}.".bib";
       my $response = $mech->get($biburl);
       next unless $response->is_success;
       $data{bibtex} = $response->decoded_content();
-      given ($data{bibtex}) {
-        # get rid of crossrefs
-        s/\s*crossref\s+=.*$//m;
-        # The following relies on @proceedings entries being last in the file returned.
-        s'@proceedings.*$''ms;
-        # Chop off extra whitespace
-        s/\s+$//ms;
-      }
+      # Chop off extra whitespace
+      $data{bibtex} =~ s/\s+$//ms;
       push @results, \%data;
       $num++;
       last if ($limit > 0 && $num >= $limit);
