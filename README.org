@@ -1,6 +1,6 @@
 * bibfetch.{pl,el}
 
-These scripts allow searching for BibTeX entries on Google Scholar and
+These scripts allow searching for BibTeX entries on Google Scholar and [[http://dblp.uni-trier.de/db/][DBLP]] and
 conveniently adding results to .bib files (at least the elisp code does).
 
 ** Requirements
@@ -40,8 +40,8 @@ are used.
 
 ** Shortcomings
 
-Currently, these scripts only support Google Scholar, but offering
-some alternatives would be nice.
+Currently, these scripts only support Google Scholar and DBLP, but
+offering some alternatives would be nice.
 
 ** Copyright / License
 

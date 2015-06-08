@@ -9,11 +9,50 @@ use Web::Scraper;
 use WWW::Mechanize;
 use String::Random;
 use Pod::Usage;
-use Getopt::Long;
+use Getopt::Long qw(:config no_ignore_case);
 use List::Util qw(min);
 use v5.10;
+no warnings 'experimental::smartmatch';
 
 our $verbose;
+
+sub dblp {
+  my ($query, $limit) = @_;
+  my $mech = WWW::Mechanize->new();
+  $query = uri_escape($query);
+  my $url = "http://dblp.uni-trier.de/search?q=$query";
+  print STDERR "URL: $url\n" if $verbose;
+  my $linkscraper = scraper {
+    process "li", "entries[]" => { class => '@class', id => '@id' };
+    result 'entries'
+  };
+  my $response = $mech->get($url);
+  my $entries = $linkscraper->scrape($response);
+  my @results;
+  my $num = 0;
+  for my $entry (@$entries) {
+    my %data = ();
+    if (defined $entry->{'class'} && $entry->{'class'} =~ /entry/) {
+      # Don't escape URL since key is used verbatim as part of URL.
+      my $biburl = "http://dblp.uni-trier.de/rec/bib2/".$entry->{'id'}.".bib";
+      my $response = $mech->get($biburl);
+      next unless $response->is_success;
+      $data{bibtex} = $response->decoded_content();
+      given ($data{bibtex}) {
+        # get rid of crossrefs
+        s/\s*crossref\s+=.*$//m;
+        # The following relies on @proceedings entries being last in the file returned.
+        s'@proceedings.*$''ms;
+        # Chop off extra whitespace
+        s/\s+$//ms;
+      }
+      push @results, \%data;
+      $num++;
+      last if ($limit > 0 && $num >= $limit);
+    }
+  }
+  return @results;
+}
 
 sub gscholar {
 
@@ -59,7 +98,6 @@ sub gscholar {
       $data{bibtex} = $response->decoded_content;
       given ($data{bibtex}) {
         # Chop off extra whitespace
-        s/^\s+//m;
         s/\s+$//m;
       }
     } else { next; }
@@ -74,7 +112,7 @@ sub gscholar {
 }
 
 
-my ($help, $pdfs, $fulltext, $doi);
+my ($help, $pdfs, $fulltext, $doi, $dblp);
 my $limit = 5;
 
 binmode STDOUT, ":utf8";
@@ -84,7 +122,8 @@ GetOptions("h|help" => \$help,
            "v|verbose" => \$verbose,
            "f|fulltext" => \$fulltext,
 	   "d|doi" => \$doi,
-           "p|pdf" => \$pdfs)
+           "p|pdf" => \$pdfs,
+           "D|dblp" => \$dblp)
   or pod2usage(1);
 
 pod2usage(1) if ($help);
@@ -94,10 +133,15 @@ pod2usage(-message => "No query given", -verbose => 1)
 
 my $query = join(" ", @ARGV);
 
-my @results = gscholar($query, $limit, $fulltext, $doi);
+my @results;
+if ($dblp) {
+  @results = dblp($query, $limit);
+} else {
+  @results = gscholar($query, $limit, $fulltext, $doi);
+}
 
 for my $result (@results[0..min($#results, $limit-1)]) {
-  print $result->{bibtex};
+  print $result->{bibtex}."\n";
   if ($pdfs && exists $result->{pdf}) {
     print "PDF: ", $result->{pdf}, "\n\n";
   }
@@ -125,6 +169,7 @@ link to a pdf, preceded by "PDF: ".
     -p|--pdf             Include PDF links in output (if any)
     -d|--doi             Search string passed in is DOI
     -f|--fulltext        Search full article text, not just the title (default)
+    -D|--dblp            Use DBLP instead of Google Scholar (does not produce PDF links)
 
 QUERY can contain anything Google Scholar accepts, such as
 author:YourFavoriteResearcher.
