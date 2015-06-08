@@ -16,6 +16,8 @@
 
 (defcustom bibfetch-script "bibfetch.pl"
   "Path to the bibfetch.pl script.")
+(defcustom bibfetch-arguments nil
+  "Arguments to pass to bibfetch.pl.")
 
 (defvar bibfetch-original-buffer nil
   "Buffer from which bibtex was called.")
@@ -83,7 +85,7 @@
 	(orig-buf (current-buffer)))
     (with-current-buffer buf
       ;; XXX make this asynchronous
-      (call-process bibfetch-script nil t nil query)
+      (apply #'call-process bibfetch-script nil t nil query bibfetch-arguments)
       (beginning-of-buffer)
       (bibfetch-mode)
       (setq bibfetch-original-buffer orig-buf)
